@@ -3,15 +3,10 @@ package antianalysis
 import (
 	"os"
 	"strings"
-
-	"github.com/StackExchange/wmi"
 )
 
 // IsVm checks if the application is running in a virtual machine environment
 func IsVm() bool {
-	if DetectVirtualBox() {
-		return true
-	}
 	// Check for common virtualization tools
 	virtualizationTools := []string{
 		"/dev/kvm",          // Kernel-based Virtual Machine (KVM)
@@ -54,43 +49,6 @@ func IsVm() bool {
 		_, err := cpuInfo.Read(cpuFlags)
 		if err == nil && strings.Contains(string(cpuFlags), "hypervisor") {
 			return true
-		}
-	}
-
-	return false
-}
-
-type Win32_ComputerSystem struct {
-	Manufacturer string
-	Model        string
-}
-
-type Win32_VideoController struct {
-	Name string
-}
-
-func DetectVirtualBox() bool {
-	var computerSystem []Win32_ComputerSystem
-	query := "SELECT * FROM Win32_ComputerSystem"
-	err := wmi.Query(query, &computerSystem)
-	if err == nil {
-		for _, system := range computerSystem {
-			if (strings.ToLower(system.Manufacturer) == "microsoft corporation" && strings.Contains(strings.ToUpper(system.Model), "VIRTUAL")) ||
-				strings.Contains(strings.ToLower(system.Manufacturer), "vmware") ||
-				system.Model == "VirtualBox" {
-				return true
-			}
-		}
-	}
-
-	var videoControllers []Win32_VideoController
-	query = "SELECT * FROM Win32_VideoController"
-	err = wmi.Query(query, &videoControllers)
-	if err == nil {
-		for _, controller := range videoControllers {
-			if strings.Contains(controller.Name, "VMware") && strings.Contains(controller.Name, "VBox") {
-				return true
-			}
 		}
 	}
 
