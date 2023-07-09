@@ -7,7 +7,6 @@ func Start() {
 	defer close(done)
 
 	checks := []func() bool{
-		HostingCheck,
 		IsDebuggerPresent,
 		IsNetworkAnalysisRunning,
 		IsVm,
