@@ -1,8 +1,6 @@
 package main
 
-import (
-	"rat/antianalysis"
-)
+import "rat/antianalysis"
 
 func main() {
 
